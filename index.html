@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indiana Managing Broker Exam</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(160deg, #0f1b2d 0%, #162440 55%, #0f1b2d 100%);
+            font-family: 'Georgia', serif;
+            padding: 2rem 1.25rem;
+            color: #e8dfc8;
+        }
+        .container { max-width: 740px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 2.5rem; }
+        .header-label { color: #c8a84b; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.5rem; }
+        h1 { color: #e8dfc8; font-size: 1.6rem; margin: 0 0 0.4rem; font-weight: normal; }
+        .header-subtitle { color: #6a8aaa; font-size: 0.9rem; margin: 0; }
+        .score-banner { background: rgba(80, 160, 80, 0.1); border: 2px solid #4caf50; border-radius: 14px; padding: 1.75rem 2rem; margin-bottom: 2rem; text-align: center; }
+        .score-banner.fail { background: rgba(200, 80, 80, 0.1); border-color: #c84b4b; }
+        .score-emoji { font-size: 3rem; margin-bottom: 0.25rem; }
+        .score-number { font-size: 3rem; font-weight: bold; line-height: 1; color: #80d880; margin-bottom: 0.4rem; }
+        .score-banner.fail .score-number { color: #e08080; }
+        .score-text { color: #b0c4de; font-size: 1.1rem; margin: 0.4rem 0 0.5rem; }
+        .score-status { color: #a0c080; font-size: 0.9rem; font-style: italic; margin-bottom: 1.25rem; }
+        .score-banner.fail .score-status { color: #e07070; }
+        .button-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .button { padding: 0.65rem 1.4rem; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-family: 'Georgia', serif; border: none; transition: all 0.2s; }
+        .button-secondary { background: rgba(180, 150, 80, 0.15); border: 1px solid #c8a84b; color: #c8a84b; }
+        .button-secondary:hover { background: rgba(180, 150, 80, 0.25); }
+        .button-primary { background: #c8a84b; color: #0f1b2d; font-weight: bold; }
+        .button-primary:hover { background: #d4b356; }
+        .button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .progress-container { margin-bottom: 1.75rem; }
+        .progress-text { display: flex; justify-content: space-between; color: #6a8aaa; font-size: 0.82rem; margin-bottom: 0.4rem; }
+        .progress-bar { height: 5px; background: rgba(255, 255, 255, 0.07); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #c8a84b, #e8c86a); border-radius: 3px; transition: width 0.3s ease; }
+        .question-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 1rem; transition: all 0.15s; }
+        .question-card.answered { background: rgba(180, 150, 80, 0.06); border-color: rgba(180, 150, 80, 0.35); }
+        .question-card.correct { background: rgba(80, 160, 80, 0.06); border-color: rgba(76, 175, 80, 0.4); }
+        .question-card.incorrect { background: rgba(200, 80, 80, 0.06); border-color: rgba(200, 80, 80, 0.35); }
+        .question-header { display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 1.1rem; }
+        .question-number { min-width: 28px; height: 28px; border-radius: 50%; background: rgba(180, 150, 80, 0.15); border: 1px solid rgba(180, 150, 80, 0.5); color: #c8a84b; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: bold; flex-shrink: 0; margin-top: 2px; }
+        .question-card.correct .question-number { background: rgba(76, 175, 80, 0.2); border-color: #4caf50; color: #80d880; }
+        .question-card.incorrect .question-number { background: rgba(200, 80, 80, 0.2); border-color: #c84b4b; color: #e08080; }
+        .question-text { color: #e8dfc8; font-size: 1rem; line-height: 1.6; margin: 0; }
+        .options { display: flex; flex-direction: column; gap: 0.5rem; margin-left: 2.5rem; }
+        .option { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 8px; padding: 0.7rem 1rem; color: #a0b4c8; font-size: 0.93rem; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 0.65rem; }
+        .option:hover { background: rgba(255, 255, 255, 0.06); }
+        .option.selected { background: rgba(180, 150, 80, 0.12); border-color: rgba(180, 150, 80, 0.55); color: #e8dfc8; }
+        .option.correct { background: rgba(76, 175, 80, 0.1); border-color: #4caf50; color: #90d890; cursor: default; }
+        .option.incorrect { background: rgba(200, 80, 80, 0.1); border-color: #c84b4b; color: #e08080; cursor: default; }
+        .option.faded { color: #4a6070; cursor: default; }
+        .option-letter { min-width: 20px; height: 20px; border-radius: 50%; border: 1px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; opacity: 0.7; flex-shrink: 0; }
+        .option-icon { margin-left: auto; font-size: 0.75rem; opacity: 0.8; }
+        .explanation { margin-top: 1rem; margin-left: 2.5rem; background: rgba(180, 150, 80, 0.06); border: 1px solid rgba(180, 150, 80, 0.2); border-radius: 8px; padding: 0.9rem 1.1rem; }
+        .explanation-label { color: #c8a84b; font-size: 0.73rem; letter-spacing: 0.12em; margin-bottom: 0.4rem; }
+        .explanation-text { color: #9ab0c8; font-size: 0.9rem; line-height: 1.6; margin: 0; }
+        .submit-section { text-align: center; margin-top: 2rem; padding-bottom: 2rem; }
+        .submit-warning { color: #6a8aaa; font-size: 0.88rem; margin-bottom: 1rem; }
+        .footer { text-align: center; color: #3a5060; font-size: 0.78rem; margin-top: 1rem; padding-bottom: 2rem; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+        
+        const questions = [
+            { id: 1, question: "Which form of ownership allows two or more people to hold title with the right of survivorship, meaning a deceased owner's share automatically passes to the surviving owner(s)?", options: ["Tenancy in Common", "Joint Tenancy", "Tenancy by the Entirety", "Tenancy at Will"], answer: 1, explanation: "Joint Tenancy includes the right of survivorship (JTWROS). When one joint tenant dies, their interest passes automatically to the surviving joint tenants — not through probate." },
+            { id: 2, question: "Under Indiana law, which form of co-ownership is available ONLY to legally married couples and includes the right of survivorship?", options: ["Joint Tenancy", "Tenancy in Common", "Tenancy by the Entirety", "Community Property"], answer: 2, explanation: "Tenancy by the Entirety is reserved for married couples in Indiana. It includes survivorship rights and also protects the property from the individual debts of either spouse." },
+            { id: 3, question: "A deed that contains the MOST covenants of warranty and provides the GREATEST protection to the grantee is a:", options: ["Quitclaim Deed", "Special Warranty Deed", "General Warranty Deed", "Bargain and Sale Deed"], answer: 2, explanation: "A General Warranty Deed warrants title against all defects, whether they arose before or during the grantor's ownership. It offers the highest level of buyer protection." },
+            { id: 4, question: "A quitclaim deed transfers:", options: ["Clear title with full warranties", "Only the grantor's interest, whatever that may be, with no warranties", "Title free and clear of all encumbrances", "Title guaranteed against all prior claims"], answer: 1, explanation: "A quitclaim deed conveys only whatever interest the grantor has — it could be full ownership or nothing at all. No title warranties are made." },
+            { id: 5, question: "Which of the four unities is NOT required to create a valid joint tenancy?", options: ["Unity of Time", "Unity of Title", "Unity of Possession", "Unity of Marriage"], answer: 3, explanation: "The four unities required for joint tenancy are Time, Title, Interest, and Possession (TTIP). Unity of Marriage is NOT required — that pertains to Tenancy by the Entirety." },
+            { id: 6, question: "Tom and Maria own a property as tenants in common. Tom dies. What happens to Tom's interest?", options: ["It automatically passes to Maria", "It passes according to Tom's will or intestate succession", "The state claims the property through escheat", "The property must be sold immediately"], answer: 1, explanation: "Tenancy in Common does NOT include survivorship rights. Each co-owner holds a distinct, transferable share that passes through their estate upon death." },
+            { id: 7, question: "For a deed to be valid and enforceable in Indiana, which element is NOT required?", options: ["Competent grantor", "Written instrument", "Recording at the county recorder's office", "Legal description of the property"], answer: 2, explanation: "Recording is NOT required for a deed to be valid between the grantor and grantee. However, recording provides constructive notice and protects against subsequent buyers." },
+            { id: 8, question: "The process by which title to real property passes to the state when an owner dies without a will and without any heirs is called:", options: ["Eminent Domain", "Escheat", "Adverse Possession", "Dedication"], answer: 1, explanation: "Escheat is the reversion of property to the state when a person dies intestate (without a will) and no legal heirs can be found." },
+            { id: 9, question: "Recording a deed in Indiana primarily serves to provide:", options: ["Actual notice to all parties", "Constructive notice to the world", "Proof that the deed is valid", "Protection against eminent domain"], answer: 1, explanation: "Recording a deed provides constructive notice — everyone is legally presumed to know about it, whether or not they actually checked the records." },
+            { id: 10, question: "A special warranty deed differs from a general warranty deed in that it only warrants title against defects arising:", options: ["Before the grantor acquired the property", "During the grantor's period of ownership", "From actions of third parties", "After the property is sold"], answer: 1, explanation: "A Special Warranty Deed only covers defects that arose during the grantor's ownership, not those that may have existed before they acquired the property." },
+            { id: 11, question: "Which method of acquiring title requires open, notorious, hostile, continuous, and actual use of another's property for a statutory period?", options: ["Dedication", "Escheat", "Adverse Possession", "Eminent Domain"], answer: 2, explanation: "Adverse Possession allows someone to acquire title by occupying and using another's land openly and continuously for the statutory period — typically 10 years in Indiana." },
+            { id: 12, question: "In Indiana, the primary office where deeds are publicly recorded is the:", options: ["County Assessor's Office", "County Recorder's Office", "Indiana Secretary of State", "County Clerk's Office"], answer: 1, explanation: "Deeds in Indiana are recorded in the County Recorder's Office of the county where the property is located, creating a public chain of title." },
+            { id: 13, question: "A corporation holds title to real property as a:", options: ["Joint Tenant", "Tenant in Common", "Tenancy in Severalty", "Tenancy by the Entirety"], answer: 2, explanation: "Tenancy in Severalty means ownership by a single legal entity — one person or one corporation alone. Despite the name, it has nothing to do with multiple owners." },
+            { id: 14, question: "Which deed covenant guarantees that the grantor actually owns the property and has the right to convey it?", options: ["Covenant of Seisin", "Covenant of Quiet Enjoyment", "Covenant Against Encumbrances", "Covenant of Further Assurance"], answer: 0, explanation: "The Covenant of Seisin is the grantor's guarantee that they actually possess and own the property and have the legal authority to convey it." },
+            { id: 15, question: "When title is transferred through a deceased person's estate, the document used to convey property is typically a:", options: ["Warranty Deed", "Executor's Deed or Personal Representative's Deed", "Quitclaim Deed", "Trustee's Deed"], answer: 1, explanation: "When an executor or personal representative conveys real property from a deceased person's estate, they use an Executor's Deed. It generally carries limited warranties." },
+            { id: 16, question: "A 'cloud on title' refers to:", options: ["A mortgage lien on the property", "Any claim or encumbrance that may impair the owner's clear title", "A deed recorded in the wrong county", "An easement granted to a utility company"], answer: 1, explanation: "A cloud on title is any outstanding claim, lien, or encumbrance that makes the title uncertain or unmarketable — such as an old unreleased mortgage or unresolved judgment." },
+            { id: 17, question: "Which of the following is an involuntary method of transferring title?", options: ["Sale by deed", "Gift by deed", "Eminent Domain", "Devise by will"], answer: 2, explanation: "Eminent Domain is the government's power to take private property for public use. It is involuntary — the owner does not choose to transfer title. Just compensation must be paid." },
+            { id: 18, question: "A deed must contain a granting clause (words of conveyance). Which phrase is an example of words of conveyance?", options: ["'This property is located at...'", "'Grantor hereby grants, bargains, and conveys...'", "'Subject to all existing easements...'", "'Grantee acknowledges receipt of...'"], answer: 1, explanation: "The granting clause uses operative words showing the grantor's intent to transfer title, such as 'grant, bargain, sell, and convey.' Without this, a deed fails to transfer ownership." },
+            { id: 19, question: "Title to real property can be transferred at death through a will. The person who makes a will is called a:", options: ["Devisee", "Legatee", "Testator", "Grantor"], answer: 2, explanation: "The person who creates a will is the Testator. Real property left by will goes to a Devisee; personal property goes to a Legatee." },
+            { id: 20, question: "A Trust holds title to real property. The person who manages the trust property for the benefit of others is the:", options: ["Trustor (Settlor)", "Beneficiary", "Trustee", "Executor"], answer: 2, explanation: "The Trustee holds legal title and manages trust assets on behalf of the beneficiaries. The Trustor creates the trust; the Beneficiary receives the benefits." },
+            { id: 21, question: "In Indiana, when does title to real property actually transfer in a sale?", options: ["When the purchase agreement is signed", "When the deed is delivered to and accepted by the grantee", "When the deed is recorded at the county recorder", "When the buyer receives the keys"], answer: 1, explanation: "Title transfers upon delivery AND acceptance of the deed. Recording is not required for the transfer to be valid between the parties, though it is strongly advisable." },
+            { id: 22, question: "Partition is a legal action used to:", options: ["Divide co-owned property when owners cannot agree", "Remove a cloud from a title", "Force a foreclosure sale", "Transfer property to a trust"], answer: 0, explanation: "A partition action allows co-owners (such as tenants in common) to legally divide or force the sale of jointly held property when they cannot agree on use or division." },
+            { id: 23, question: "Which of the following is TRUE about tenants in common?", options: ["They must hold equal shares", "They must acquire title at the same time", "Each co-owner can hold an unequal share and transfer it freely", "The right of survivorship applies automatically"], answer: 2, explanation: "Tenants in Common can hold unequal shares, acquire them at different times, and freely transfer their individual interest. There is no right of survivorship." },
+            { id: 24, question: "A deed that conveys property FROM a trustee back to the original owner (trustor) is called a:", options: ["Reconveyance Deed", "Sheriff's Deed", "Bargain and Sale Deed", "Deed in Lieu of Foreclosure"], answer: 0, explanation: "A Reconveyance Deed is used when a trust deed is paid off and the trustee returns legal title to the borrower/trustor." },
+            { id: 25, question: "A Sheriff's Deed is issued when property is sold as a result of:", options: ["A voluntary sale by the owner", "A court-ordered foreclosure or tax sale", "A gift to a family member", "An exchange of properties"], answer: 1, explanation: "A Sheriff's Deed is issued by the sheriff after a court-ordered sale — typically in a mortgage foreclosure or judgment lien enforcement." },
+            { id: 26, question: "What type of notice is given when a person actually knows about a prior conveyance or claim on a property?", options: ["Constructive Notice", "Inquiry Notice", "Actual Notice", "Imputed Notice"], answer: 2, explanation: "Actual Notice means the party has direct, personal knowledge of the prior claim or conveyance — they were told about it or otherwise know about it firsthand." },
+            { id: 27, question: "A 'chain of title' refers to:", options: ["A list of all property taxes owed", "The successive recorded ownership history of a property", "The legal description of a parcel", "The mortgage history of a property"], answer: 1, explanation: "The chain of title is the chronological sequence of recorded documents showing the history of ownership from the original grant to the current owner." },
+            { id: 28, question: "When a joint tenancy is 'severed' by one co-owner selling their interest to a third party, the result is:", options: ["The joint tenancy continues with the new buyer", "The new buyer becomes a tenant in common with the remaining joint tenants", "The remaining owners must buy out the new buyer", "The entire property must be sold"], answer: 1, explanation: "Selling one joint tenant's interest destroys the unities necessary for joint tenancy. The buyer becomes a Tenant in Common with the remaining owners." },
+            { id: 29, question: "An acknowledgment on a deed refers to:", options: ["The grantee's signature accepting the deed", "The grantor's formal declaration before a notary that the signature is their own free act", "The county recorder's stamp of approval", "The legal description of the property"], answer: 1, explanation: "An acknowledgment is the grantor's sworn statement before a notary public confirming they signed the deed voluntarily. It is typically required for recording in Indiana." },
+            { id: 30, question: "Under Indiana's recording act, a subsequent bona fide purchaser who records their deed first is generally protected against a prior unrecorded deed. This reflects what type of recording statute?", options: ["Pure Notice Statute", "Race Statute", "Race-Notice Statute", "Marketable Title Act"], answer: 2, explanation: "Indiana follows a Race-Notice recording statute. A subsequent purchaser is protected only if they (1) had no notice of the prior conveyance AND (2) record their deed first." }
+        ];
+        
+        function PracticeTest() {
+            const [userAnswers, setUserAnswers] = useState({});
+            const [submitted, setSubmitted] = useState(false);
+            const [showReview, setShowReview] = useState(false);
+            
+            const answered = Object.keys(userAnswers).length;
+            const allAnswered = answered === questions.length;
+            
+            function selectAnswer(qId, optIdx) {
+                if (submitted) return;
+                setUserAnswers(prev => ({ ...prev, [qId]: optIdx }));
+            }
+            
+            function handleSubmit() {
+                if (!allAnswered) return;
+                setSubmitted(true);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+            
+            function handleRestart() {
+                setUserAnswers({});
+                setSubmitted(false);
+                setShowReview(false);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+            
+            const score = submitted ? questions.filter(q => userAnswers[q.id] === q.answer).length : 0;
+            const pct = Math.round((score / questions.length) * 100);
+            const passed = pct >= 75;
+            
+            return (
+                <div className="container">
+                    <div className="header">
+                        <div className="header-label">Indiana Managing Broker Exam</div>
+                        <h1>Forms of Ownership, Transfer & Recording of Title</h1>
+                        <p className="header-subtitle">30 Questions · Answer all, then submit · 75% to pass</p>
+                    </div>
+                    
+                    {submitted && (
+                        <div className={`score-banner ${passed ? '' : 'fail'}`}>
+                            <div className="score-emoji">{passed ? '🏆' : '📚'}</div>
+                            <div className="score-number">{pct}%</div>
+                            <div className="score-text">{score} of {questions.length} correct</div>
+                            <div className="score-status">
+                                {passed ? '✓ Above the 75% passing threshold — well done!' : '✗ Below the 75% passing threshold — keep reviewing!'}
+                            </div>
+                            <div className="button-group">
+                                <button className="button button-secondary" onClick={() => { setShowReview(v => !v); }}>
+                                    {showReview ? 'Hide Explanations' : 'Review Answers'}
+                                </button>
+                                <button className="button button-primary" onClick={handleRestart}>
+                                    Retake Test
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <div className={`progress-container ${submitted ? 'hidden' : ''}`}>
+                        <div className="progress-text">
+                            <span>{answered} of {questions.length} answered</span>
+                            <span>{questions.length - answered} remaining</span>
+                        </div>
+                        <div className="progress-bar">
+                            <div className="progress-fill" style={{ width: `${(answered / questions.length) * 100}%` }}></div>
+                        </div>
+                    </div>
+                    
+                    {questions.map((q, qi) => {
+                        const ua = userAnswers[q.id];
+                        const isCorrect = submitted && ua === q.answer;
+                        const isWrong = submitted && ua !== undefined && ua !== q.answer;
+                        
+                        let cardClass = 'question-card';
+                        if (submitted) {
+                            if (isCorrect) cardClass += ' correct';
+                            else if (isWrong) cardClass += ' incorrect';
+                        } else if (ua !== undefined) {
+                            cardClass += ' answered';
+                        }
+                        
+                        return (
+                            <div key={q.id} className={cardClass}>
+                                <div className="question-header">
+                                    <div className="question-number">{qi + 1}</div>
+                                    <p className="question-text">{q.question}</p>
+                                </div>
+                                
+                                <div className="options">
+                                    {q.options.map((opt, i) => {
+                                        let optClass = 'option';
+                                        
+                                        if (!submitted && ua === i) {
+                                            optClass += ' selected';
+                                        }
+                                        
+                                        if (submitted) {
+                                            if (i === q.answer) {
+                                                optClass += ' correct';
+                                            } else if (i === ua && i !== q.answer) {
+                                                optClass += ' incorrect';
+                                            } else if (i !== q.answer) {
+                                                optClass += ' faded';
+                                            }
+                                        }
+                                        
+                                        return (
+                                            <div
+                                                key={i}
+                                                className={optClass}
+                                                onClick={() => selectAnswer(q.id, i)}
+                                            >
+                                                <span className="option-letter">{String.fromCharCode(65 + i)}</span>
+                                                <span>{opt}</span>
+                                                {submitted && i === q.answer && <span className="option-icon">✓</span>}
+                                                {submitted && i === ua && i !== q.answer && <span className="option-icon">✗</span>}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                
+                                {submitted && showReview && (
+                                    <div className="explanation">
+                                        <div className="explanation-label">EXPLANATION</div>
+                                        <p className="explanation-text">{q.explanation}</p>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                    
+                    <div className={`submit-section ${submitted ? 'hidden' : ''}`}>
+                        {!allAnswered && (
+                            <p className="submit-warning">
+                                Please answer all {questions.length - answered} remaining question{questions.length - answered !== 1 ? 's' : ''} to submit.
+                            </p>
+                        )}
+                        <button 
+                            className="button button-primary" 
+                            onClick={handleSubmit} 
+                            disabled={!allAnswered}
+                            style={{ opacity: allAnswered ? 1 : 0.4, cursor: allAnswered ? 'pointer' : 'not-allowed' }}
+                        >
+                            Submit All Answers →
+                        </button>
+                    </div>
+                    
+                    {submitted && (
+                        <div className="footer">
+                            75% required to pass · Forms of Ownership, Transfer & Recording of Title
+                        </div>
+                    )}
+                </div>
+            );
+        }
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PracticeTest />);
+    </script>
+</body>
+</html>
