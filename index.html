@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Indiana Managing Broker Practice Test</title>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+body{
+margin:0;
+font-family:Georgia,serif;
+background:linear-gradient(160deg,#0f1b2d,#162440,#0f1b2d);
+color:#e8dfc8;
+}
+
+.container{
+max-width:740px;
+margin:auto;
+padding:40px 20px;
+}
+
+.card{
+background:rgba(255,255,255,0.03);
+border:1px solid rgba(255,255,255,0.08);
+border-radius:12px;
+padding:22px;
+margin-bottom:14px;
+}
+
+.option{
+padding:10px 14px;
+border-radius:8px;
+border:1px solid rgba(255,255,255,0.15);
+margin-bottom:6px;
+cursor:pointer;
+}
+
+.option:hover{
+background:rgba(200,170,80,0.08);
+}
+
+.correct{
+border:1px solid #4caf50;
+background:rgba(76,175,80,0.1);
+}
+
+.wrong{
+border:1px solid #c84b4b;
+background:rgba(200,80,80,0.1);
+}
+
+button{
+background:#c8a84b;
+border:none;
+padding:14px 30px;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+
+const {useState} = React;
+
+const questions = [
+
+{
+id:1,
+question:"Which form of ownership allows two or more people to hold title with survivorship?",
+options:["Tenancy in Common","Joint Tenancy","Tenancy by the Entirety","Tenancy at Will"],
+answer:1,
+explanation:"Joint Tenancy includes the right of survivorship."
+},
+
+{
+id:2,
+question:"Which deed provides the greatest protection to the buyer?",
+options:["Quitclaim Deed","Special Warranty Deed","General Warranty Deed","Bargain and Sale Deed"],
+answer:2,
+explanation:"A general warranty deed protects against all title defects."
+}
+
+];
+
+function App(){
+
+const [answers,setAnswers] = useState({})
+const [submitted,setSubmitted] = useState(false)
+const [review,setReview] = useState(false)
+
+function choose(q,opt){
+if(submitted) return
+setAnswers({...answers,[q]:opt})
+}
+
+const score = questions.filter(q=>answers[q.id]===q.answer).length
+const pct = Math.round((score/questions.length)*100)
+
+return(
+
+<div className="container">
+
+<h1>Indiana Managing Broker Practice Test</h1>
+
+{submitted &&
+<div style={{marginBottom:"20px"}}>
+<h2>Score: {score} / {questions.length} ({pct}%)</h2>
+
+<button onClick={()=>setReview(!review)}>
+{review ? "Hide Review" : "Review Answers"}
+</button>
+</div>
+}
+
+{questions.map((q,i)=>{
+
+const ua = answers[q.id]
+
+return(
+
+<div key={q.id} className="card">
+
+<div style={{marginBottom:"10px"}}>
+<b>{i+1}. {q.question}</b>
+</div>
+
+{q.options.map((opt,idx)=>{
+
+let className="option"
+
+if(submitted){
+if(idx===q.answer) className+=" correct"
+else if(idx===ua) className+=" wrong"
+}
+
+return(
+
+<div
+key={idx}
+className={className}
+onClick={()=>choose(q.id,idx)}
+>
+
+{String.fromCharCode(65+idx)}. {opt}
+
+</div>
+
+)
+
+})}
+
+{submitted && review &&
+<div style={{marginTop:"10px",opacity:.85}}>
+<b>Explanation:</b> {q.explanation}
+</div>
+}
+
+</div>
+
+)
+
+})}
+
+{!submitted &&
+<button
+disabled={Object.keys(answers).length!==questions.length}
+onClick={()=>setSubmitted(true)}
+>
+Submit Test
+</button>
+}
+
+</div>
+
+)
+
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>)
+
+</script>
+
+</body>
+</html>
+
